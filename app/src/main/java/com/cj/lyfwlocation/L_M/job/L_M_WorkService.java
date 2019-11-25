@@ -53,7 +53,7 @@ public class L_M_WorkService extends JobService {
                         //todo 上传坐标 start
 
                         /**上传坐标的逻辑一定要写在这里**/
-                        postDataHttp(String.valueOf(info.getLatitude()),String.valueOf(info.getLongitude()));
+                        //postDataHttp(String.valueOf(info.getLatitude()),String.valueOf(info.getLongitude()));
 
                         //todo 上传坐标 stop
                         jobFinished(jobParameters, false);

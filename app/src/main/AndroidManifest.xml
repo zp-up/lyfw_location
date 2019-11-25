@@ -73,6 +73,12 @@
 
         <service android:name="com.cj.lyfwlocation.locate.LocationForegroundService"/>
 
+        <!-- 无声音乐 -->
+        <service
+            android:name=".MusicLoopService"
+            android:enabled="true"
+            android:exported="true" />
+
 
     </application>
 
