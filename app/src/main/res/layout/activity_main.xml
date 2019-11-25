@@ -16,4 +16,20 @@
         android:layout_height="fill_parent"
         android:layout_marginTop="0dp" />
 
+
+    <Button
+        android:text="start"
+        android:id="@+id/start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+    </Button>
+
+    <Button
+        android:text="stop"
+        android:layout_below="@id/start"
+        android:id="@+id/stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
 </RelativeLayout>

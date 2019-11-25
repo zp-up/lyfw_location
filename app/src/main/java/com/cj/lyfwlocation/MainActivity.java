@@ -36,7 +36,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
+public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks, View.OnClickListener {
 
     private int requestCode = 111;
     private String permissions[] = {
@@ -61,35 +61,48 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //初始化存储
+        MMKV.initialize(this);
 
-        String rootDir = MMKV.initialize(this);
-        Log.e("lyfw","存储位置："+rootDir);
+        //检查权限
+        checkPermission();
+
+        //注册定位回调
         LocationCenter.getInstance().register(this);
-        if(hasPermission());
 
+
+        //适配vivo、oppo开启通知
+        try{
+            setVIVO();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+        /**我注释了这里，测试的时候不需要**/
+        //initWeb();
+
+
+        findViewById(R.id.start).setOnClickListener(this);
+
+        findViewById(R.id.stop).setOnClickListener(this);
+
+
+    }
+
+
+    private void initWeb(){
         //webview
-        mWebview = (WebView) findViewById(R.id.webView1);
+        mWebview = findViewById(R.id.webView1);
         mWebview.addJavascriptInterface(new positionUtils(this),"js");
         WebSettings webSettings = mWebview.getSettings();
-        //new positionUtils(this);
-        //  webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK); //设置缓存
         webSettings.setJavaScriptEnabled(true);//设置能够解析Javascript
         webSettings.setDomStorageEnabled(true);//设置适应Html5 //重点是这个设置
         webSettings.setLoadsImagesAutomatically(true); //支持自动加载图片
         webSettings.setDefaultTextEncodingName("utf-8");//设置编码格式
         //启用地理定位
         webSettings.setGeolocationEnabled(true);
-        setVIVO();
         mWebview.loadUrl("http://t.lyfw.tjsjnet.com/user/clocks!wx.htm?url=server_in/work_daka");
-
-        LocationCenter.getInstance().register(this);
-        //注册定位回调
-        LocationCenter.getInstance().register(getApplication().getApplicationContext());
-
-        //前台定位服务
-        serviceIntent = new Intent();
-        serviceIntent.setClass(this, LocationForegroundService.class);
-
         mWebview.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -197,16 +210,14 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
 
 
-
-    private boolean hasPermission() {
+    private void checkPermission() {
 
         if (!EasyPermissions.hasPermissions(this, permissions)) {
             EasyPermissions.requestPermissions(this, "请授予我动态权限", requestCode, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            return false;
         }
 
-        return true;
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -214,6 +225,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         //将请求结果传递EasyPermission库处理
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
+
 
     @Override
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
@@ -269,6 +281,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             mWebview = null;
         }
     }
+
     //点击返回上一页面而不是退出浏览器
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -288,6 +301,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             }
         }
     }
+
 
     private boolean isNotificationEnabled(Context context) {
         AppOpsManager appOpsManager = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
@@ -315,6 +329,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         return false;
     }
 
+
     public static void toSettingPage(Context context) {
         Intent intent = new Intent();
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -327,5 +342,18 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             intent.putExtra("com.android.settings.ApplicationPkgName", context.getPackageName());
         }
         context.startActivity(intent);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.start:
+                startWork();
+                break;
+
+            case R.id.stop:
+                stopWork();
+                break;
+        }
     }
 }

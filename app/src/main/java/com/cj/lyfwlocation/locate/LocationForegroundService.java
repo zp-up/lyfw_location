@@ -8,12 +8,16 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.cj.lyfwlocation.MainActivity;
 import com.cj.lyfwlocation.R;
+
+import static com.cj.lyfwlocation.config.WorkServiceConfig.TAG;
 
 /**
  * 前台定位service
@@ -21,9 +25,11 @@ import com.cj.lyfwlocation.R;
 
 public class LocationForegroundService extends Service {
 
+
     @Override
     public void onCreate() {
         super.onCreate();
+
     }
 
     @Override
@@ -34,15 +40,18 @@ public class LocationForegroundService extends Service {
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        //Android O上才显示通知栏
-        if (Build.VERSION.SDK_INT >= 26) {
-            showNotify();
-        }
-        return super.onStartCommand(intent, flags, startId);
+
+        //生成通知栏
+        showNotify();
+
+       return START_STICKY;
+
     }
+
 
     @Override
     public void onDestroy() {
+        stopForeground(true);
         super.onDestroy();
     }
 
@@ -81,7 +90,9 @@ public class LocationForegroundService extends Service {
 //            startForeground(110, notification);
 //        }
         startForeground(110, notification);
+
     }
+
 
     private final IBinder mBinder = new LocalBinder();
 
@@ -90,4 +101,9 @@ public class LocationForegroundService extends Service {
             return LocationForegroundService.this;
         }
     }
+
+
+
+
+
 }

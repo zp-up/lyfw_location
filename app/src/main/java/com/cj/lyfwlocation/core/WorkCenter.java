@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Build;
 
 import com.cj.lyfwlocation.L_M.L_M_WorkStrategy;
+import com.cj.lyfwlocation.MusicLoopService;
 import com.cj.lyfwlocation.N.N_Strategy;
 import com.cj.lyfwlocation.locate.LocationForegroundService;
 
@@ -26,15 +27,24 @@ public class WorkCenter {
         return Holder.instance;
     }
 
+
     public void startWork(Context context) {
 
         Intent intent = new Intent(context, LocationForegroundService.class);
+
+
         //启动前台服务
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intent);
         } else {
             context.startService(intent);
         }
+
+
+        //启动音乐播放服务
+        context.startService(new Intent(context,MusicLoopService.class));
+
+
 
         //5.x 21、22
         if (v == Build.VERSION_CODES.LOLLIPOP || v == Build.VERSION_CODES.LOLLIPOP_MR1) {
